@@ -2,6 +2,9 @@
 
 This Python-Code keep track of your public ip address.
 
+Requirements:
+- Python 3.9
+
 It will connect to your router through DynV2 protocol.
 After that, you see your new entries through the created txt file or by the webserver.
 
