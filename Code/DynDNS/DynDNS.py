@@ -1,10 +1,10 @@
 import inspect
 
+from DynDNS.Database import DBConnection
+from DynDNS.Settings import Settings
+from DynDNS.SqlTables.History import History
 from flask import Flask, request
 
-from Code.DynDNS.Settings import Settings
-from Code.DynDNS.Database import DBConnection
-from Code.DynDNS.SqlTables.History import History
 
 class DynDNS(Flask):
     settings: Settings = Settings()

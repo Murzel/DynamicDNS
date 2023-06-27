@@ -1,8 +1,7 @@
 from datetime import datetime
 
+from GoDaddy.Database import Database
 from peewee import *
-
-from Code.GoDaddy.Database import Database
 
 
 class History(Database):

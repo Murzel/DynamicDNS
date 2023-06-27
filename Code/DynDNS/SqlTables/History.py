@@ -1,8 +1,7 @@
 from datetime import datetime
 
+from DynDNS.Database import Database
 from peewee import *
-
-from Code.DynDNS.Database import Database
 
 
 class History(Database):

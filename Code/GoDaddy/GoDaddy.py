@@ -1,9 +1,8 @@
 import json
 
 import requests
-
-from Code.GoDaddy.Database import DBConnection
-from Code.GoDaddy.SqlTables.History import History
+from GoDaddy.Database import DBConnection
+from GoDaddy.SqlTables.History import History
 
 
 class GoDaddy:

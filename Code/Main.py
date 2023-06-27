@@ -1,7 +1,7 @@
 from configparser import ConfigParser
 
-from Code.DynDNS.DynDNS import dyndns
-from Code.GoDaddy.GoDaddy import GoDaddy
+from DynDNS.DynDNS import dyndns
+from GoDaddy.GoDaddy import GoDaddy
 
 config = ConfigParser()
 config.read("Settings.conf")
