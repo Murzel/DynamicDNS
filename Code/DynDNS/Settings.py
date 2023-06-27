@@ -3,7 +3,6 @@ from configparser import ConfigParser
 class Settings:
     username: str
     password: str
-    port: int
 
     def __init__(self):
         config = ConfigParser()
