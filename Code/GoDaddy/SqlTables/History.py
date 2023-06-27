@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from GoDaddy.Database import Database
+from GoDaddy.Database import BaseModel
 from peewee import *
 
 
-class History(Database):
+class History(BaseModel):
     type = TextField()
     name = TextField()
     ip_address = TextField()

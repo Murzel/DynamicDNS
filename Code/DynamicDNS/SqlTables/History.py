@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from DynamicDNS.Database import Database
+from DynamicDNS.Database import BaseModel
 from peewee import *
 
 
-class History(Database):
+class History(BaseModel):
     ip_address = TextField()
     timestamp = DateTimeField(default=datetime.now)

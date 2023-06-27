@@ -1,5 +1,6 @@
 from configparser import ConfigParser
 
+
 class Settings:
     domain: str
     key: str

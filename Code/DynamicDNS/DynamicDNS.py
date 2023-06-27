@@ -1,6 +1,6 @@
 import inspect
 
-from DynamicDNS.Database import DBConnection
+from DynamicDNS.Database import database
 from DynamicDNS.Settings import Settings
 from DynamicDNS.SqlTables.History import History
 from flask import Flask, request
@@ -21,7 +21,7 @@ class DynamicDNS(Flask):
 
         self.__current_ip = ip
 
-        with DBConnection():
+        with database:
             History.create(ip_address = ip).\
                     save()
         
@@ -47,7 +47,7 @@ class DynamicDNS(Flask):
 
 dynamicdns = DynamicDNS(__name__)
 
-with DBConnection():
+with database:
     History.create_table()
 
 @dynamicdns.route("/", methods=["GET"])

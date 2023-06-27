@@ -1,16 +1,17 @@
 import json
 
 import requests
-from GoDaddy.Database import DBConnection
+from GoDaddy.Database import database
 from GoDaddy.Settings import Settings
 from GoDaddy.SqlTables.History import History
+
 
 class GoDaddy:
     base_url = "https://api.godaddy.com"
     settings = Settings()
 
     def __init__(self) -> None:
-        with DBConnection():
+        with database:
             History.create_table()
 
     def toList(self, request : requests) -> dict:
@@ -29,7 +30,7 @@ class GoDaddy:
         # Assumes everything will be fine in the following put request...    
         print(f'GoDaddy DNS Record ({type}, {name}) updated to new ip ("{ip}")')
 
-        with DBConnection():
+        with database:
             History.create(type = type, name = name, ip_address = ip).\
                     save()
 
