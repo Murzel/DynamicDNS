@@ -2,7 +2,7 @@ import json
 
 import requests
 
-from Code.GoDaddy.Database import db
+from Code.GoDaddy.Database import DBConnection
 from Code.GoDaddy.SqlTables.History import History
 
 
@@ -14,9 +14,8 @@ class GoDaddy:
         self.getHeaders = {"Authorization": "sso-key " + key + ":" + secret}
         self.putHeaders = self.getHeaders | {"Content-Type": "application/json"}
 
-        # Initialize database
-        db.connect()
-        History.create_table()
+        with DBConnection():
+            History.create_table()
 
     def toList(self, request : requests) -> dict:
         return json.loads(request.content.decode("utf-8"))[0]
@@ -33,10 +32,8 @@ class GoDaddy:
         return requests.put(self.base_url + f"/v1/domains/{self.domain}/records/{type}/{name}", body, headers=self.putHeaders).status_code
 
     def addLog(self, record_type : str, record_name : str,  record_ip : str) -> str:
-        History.create(type = record_type, name = record_name, ip_address = record_ip). \
-                save()
+        with DBConnection():
+            History.create(type = record_type, name = record_name, ip_address = record_ip).\
+                    save()
     
         print(f'GoDaddy DNS Record ({record_type}, {record_name}) updated to new ip ("{record_ip}")')
-    
-    def __del__(self):
-        db.close()

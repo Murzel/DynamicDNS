@@ -3,7 +3,7 @@ import inspect
 import re
 import socket
 
-from Code.DynDNS.Database import db
+from Code.DynDNS.Database import DBConnection
 from Code.DynDNS.SqlTables.History import History
 from Code.Helper import *
 from Code.Socket_Helper import Server_Socket
@@ -20,9 +20,8 @@ class DynDNS:
 
         self.server = Server_Socket(port if port else 1337)
 
-        # Initialize database
-        db.connect()
-        History.create_table()
+        with DBConnection():
+            History.create_table()
 
     def run(self):
         # Magic / Logic - Depends on the view
@@ -99,10 +98,8 @@ class DynDNS:
                 event()
 
     def addLog(self, ip : str) -> str:
-        History.create(ip_address = ip). \
-                save()
+        with DBConnection():
+            History.create(ip_address = ip).\
+                    save()
         
         print(f"New Dynamic DNS Ip Address {ip} has been assigned")
-
-    def __del__(self):
-        db.close()
