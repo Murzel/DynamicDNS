@@ -9,11 +9,7 @@ from GoDaddy.SqlTables.History import History
 class GoDaddy:
     base_url = "https://api.godaddy.com"
     settings = Settings()
-
-    def __init__(self) -> None:
-        with database:
-            History.create_table()
-
+        
     def toList(self, request : requests) -> dict:
         return json.loads(request.content.decode("utf-8"))[0]
 
@@ -39,5 +35,6 @@ class GoDaddy:
         body = json.dumps([{"data": ip, "name": name, "ttl": previous_record.get("ttl"), "type": type}])
 
         return requests.put(self.base_url + f"/v1/domains/{self.settings.domain}/records/{type}/{name}", body, headers=headers).status_code
+    
     
 godaddy = GoDaddy()

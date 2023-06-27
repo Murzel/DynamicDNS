@@ -45,10 +45,8 @@ class DynamicDNS(Flask):
 
         return None
 
-dynamicdns = DynamicDNS(__name__)
 
-with database:
-    History.create_table()
+dynamicdns = DynamicDNS(__name__)
 
 @dynamicdns.route("/", methods=["GET"])
 def root():
