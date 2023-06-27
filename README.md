@@ -10,5 +10,5 @@ Requirements:
 - Sqlite3
 
 Required Python libraries:
-- Flask
-- peewee
+- Flask (Webserver)
+- peewee (SQL-ORM)
