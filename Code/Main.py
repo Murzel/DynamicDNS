@@ -1,4 +1,4 @@
-from DynDNS.DynDNS import dyndns
+from DynamicDNS.DynamicDNS import dynamicdns as dyndns
 from GoDaddy.GoDaddy import godaddy
 
 if __name__ == "__main__":

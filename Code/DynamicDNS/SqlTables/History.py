@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from DynDNS.Database import Database
+from DynamicDNS.Database import Database
 from peewee import *
 
 

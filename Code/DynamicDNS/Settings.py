@@ -8,6 +8,6 @@ class Settings:
         config = ConfigParser()
         config.read("Settings.conf")
 
-        self.username = config.get("DynDNS", "username")
-        self.password = config.get("DynDNS", "password")
+        self.username = config.get("DynamicDNS", "username")
+        self.password = config.get("DynamicDNS", "password")
         

@@ -1,12 +1,12 @@
 import inspect
 
-from DynDNS.Database import DBConnection
-from DynDNS.Settings import Settings
-from DynDNS.SqlTables.History import History
+from DynamicDNS.Database import DBConnection
+from DynamicDNS.Settings import Settings
+from DynamicDNS.SqlTables.History import History
 from flask import Flask, request
 
 
-class DynDNS(Flask):
+class DynamicDNS(Flask):
     settings: Settings = Settings()
     __current_ip: str = None
     __events = []
@@ -45,25 +45,25 @@ class DynDNS(Flask):
 
         return None
 
-dyndns = DynDNS(__name__)
+dynamicdns = DynamicDNS(__name__)
 
 with DBConnection():
     History.create_table()
 
-@dyndns.route("/", methods=["GET"])
+@dynamicdns.route("/", methods=["GET"])
 def root():
     """ Returns current ip address"""
-    if dyndns.current_ip:
-        return (dyndns.current_ip, 200)
+    if dynamicdns.current_ip:
+        return (dynamicdns.current_ip, 200)
     
     return ("", 204) # No Content
 
-@dyndns.route("/nic/update", methods=["GET"])
+@dynamicdns.route("/nic/update", methods=["GET"])
 def update():
     if not request.authorization: return ("", 200)
-    if request.authorization.username != dyndns.settings.username: return ("", 200)
-    if request.authorization.password != dyndns.settings.password: return ("", 200)
+    if request.authorization.username != dynamicdns.settings.username: return ("", 200)
+    if request.authorization.password != dynamicdns.settings.password: return ("", 200)
 
-    dyndns.current_ip = request.args.get("myip")
+    dynamicdns.current_ip = request.args.get("myip")
 
     return ("", 200)
