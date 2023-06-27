@@ -1,15 +1,12 @@
-# DynDNS
+# DynamicDNS
 
-This Python-Code keep track of your public ip address.
+This project keeps track of your public ip address by listening to your router (DynV2 protocol).
+
+It's very easy to trigger your own code by defining a decorated function.
+An example, where the GoDaddy DNS Record will be updated, is already provided in the code.
 
 Requirements:
 - Python 3.9
-
-It will connect to your router through DynV2 protocol.
-After that, you see your new entries through the created txt file or by the webserver.
-
-In the browser just type the local ip address of the device running this script with the port (default port is 1337).
-e.g.: 192.168.2.102:1337
-
-You can also include your own code, which will be triggered when the ip changes.
-An example, where the GoDaddy DNS Record will be updated, is already provided in the code.
+- Flask
+- peewee
+- Sqlite3
