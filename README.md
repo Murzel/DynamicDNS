@@ -7,6 +7,8 @@ An example, where the GoDaddy DNS Record will be updated, is already provided in
 
 Requirements:
 - Python 3.9
+- Sqlite3
+
+Required Python libraries:
 - Flask
 - peewee
-- Sqlite3
