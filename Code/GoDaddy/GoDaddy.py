@@ -27,13 +27,11 @@ class GoDaddy:
         ttl = self.getDNSRecord("A", "@").get("ttl")
         body = json.dumps([{"data": ip, "name": name, "ttl": ttl, "type": type}])
 
-        self.addLog(type, name, ip)
+        with DBConnection():
+            History.create(type = type, name = name, ip_address = ip).\
+                    save()
+
+        # assumes everything will be fine in the following put request...    
+        print(f'GoDaddy DNS Record ({type}, {name}) updated to new ip ("{ip}")')
 
         return requests.put(self.base_url + f"/v1/domains/{self.domain}/records/{type}/{name}", body, headers=self.putHeaders).status_code
-
-    def addLog(self, record_type : str, record_name : str,  record_ip : str) -> str:
-        with DBConnection():
-            History.create(type = record_type, name = record_name, ip_address = record_ip).\
-                    save()
-    
-        print(f'GoDaddy DNS Record ({record_type}, {record_name}) updated to new ip ("{record_ip}")')
