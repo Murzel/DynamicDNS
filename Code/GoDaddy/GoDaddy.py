@@ -2,17 +2,14 @@ import json
 
 import requests
 from GoDaddy.Database import DBConnection
+from GoDaddy.Settings import Settings
 from GoDaddy.SqlTables.History import History
-
 
 class GoDaddy:
     base_url = "https://api.godaddy.com"
-    
-    def __init__(self, domain : str, key : str, secret : str) -> None:
-        self.domain     = domain
-        self.getHeaders = {"Authorization": "sso-key " + key + ":" + secret}
-        self.putHeaders = self.getHeaders | {"Content-Type": "application/json"}
+    settings = Settings()
 
+    def __init__(self) -> None:
         with DBConnection():
             History.create_table()
 
@@ -20,7 +17,7 @@ class GoDaddy:
         return json.loads(request.content.decode("utf-8"))[0]
 
     def getDNSRecord(self, type : str, name : str) -> dict: 
-        return self.toList(requests.get(self.base_url + f"/v1/domains/{self.domain}/records/{type}/{name}", headers=self.getHeaders))
+        return self.toList(requests.get(self.base_url + f"/v1/domains/{self.settings.domain}/records/{type}/{name}", headers=self.settings.getAuthorizationHeader()))
 
     def updateDNSRecord(self, type : str, name : str, ip : str):
         previous_record = self.getDNSRecord(type, name)
@@ -37,6 +34,9 @@ class GoDaddy:
                     save()
 
         # Send actual request to update the ip address
+        headers = self.settings.getAuthorizationHeader() | {"Content-Type": "application/json"}
         body = json.dumps([{"data": ip, "name": name, "ttl": previous_record.get("ttl"), "type": type}])
 
-        return requests.put(self.base_url + f"/v1/domains/{self.domain}/records/{type}/{name}", body, headers=self.putHeaders).status_code
+        return requests.put(self.base_url + f"/v1/domains/{self.settings.domain}/records/{type}/{name}", body, headers=headers).status_code
+    
+godaddy = GoDaddy()
