@@ -1,13 +1,18 @@
+import base64
+import inspect
+import re
+import socket
+
+from Code.DynDNS.Database import db
+from Code.DynDNS.SqlTables.History import History
+from Code.Helper import *
 from Code.Socket_Helper import Server_Socket
 from Code.Web_Response import HTTP_Response
-from Code.Helper import *
-import socket, re, base64, inspect, sqlite3
+
 
 class DynDNS:
     current_ip = "UNKNOWN YET"
     __events = []
-    logfile_filename = "DynDNS.log"
-
 
     def __init__(self, username : str, password : str, port : int = 1337) -> None:
         self.username = username
@@ -15,19 +20,9 @@ class DynDNS:
 
         self.server = Server_Socket(port if port else 1337)
 
-        # Connect to database, if not exist, create it
-        self.logfile = sqlite3.connect("DynDNS.sqlite3")
-
-        # Create table if not exist
-        self.logfile.execute("""
-            CREATE TABLE IF NOT EXISTS History(
-                id INTEGER PRIMARY KEY, 
-                ip TEXT NOT NULL,
-                updated DATE DEFAULT CURRENT_TIMESTAMP
-            );""")
-
-        # Apply changes
-        self.logfile.commit()
+        # Initialize database
+        db.connect()
+        History.create_table()
 
     def run(self):
         # Magic / Logic - Depends on the view
@@ -70,7 +65,8 @@ class DynDNS:
                                     if self.current_ip != ip:
                                         self.current_ip = ip
                                         self.__trigger_update()
-                                        print("New", self.addLog(ip))
+                                        self.addLog(ip)
+
                                         client_socket.sendall(HTTP_Response().STATUS_no_content())
                     else:
                         # client_socket.sendall(HTTP_Response().MIME_text_html("Page not found - 404"))
@@ -102,42 +98,11 @@ class DynDNS:
             else:
                 event()
 
-    # logfile
     def addLog(self, ip : str) -> str:
-        # Increment id by 1
-        self.logfile.execute("""UPDATE History SET id = - (id + 1) WHERE id > 0;""")
-        self.logfile.execute("""UPDATE History SET id = - id WHERE id < 0;""")
-
-        # Add new entry
-        self.logfile.execute(f"""INSERT INTO History(id, ip) VALUES(1, "{ip}");""")
-
-        # Delete entries with id > 100
-        self.logfile.execute("""DELETE FROM History WHERE id > 100""")
+        History.create(ip_address = ip). \
+                save()
         
-        # Apply changes
-        self.logfile.commit()
+        print(f"New Dynamic DNS Ip Address {ip} has been assigned")
 
-        # Create text file with formatted output of tbl
-        self.createLogfile()
-
-        return f"Ip Adress {ip} has been logged"
-
-    def createLogfile(self, entries : int = 100) -> None:
-        with open(self.logfile_filename, "w") as f:
-            f.write(self.logfileToString(entries))
-
-    def logfileToString(self, entries : int = 100) -> str:
-        stringBuilder = []
-
-        stringBuilder.append("=" * 68)
-        stringBuilder.append("{:^10}|{:^28}|{:^28}".format("Index", "IP Address", "Updated At"))
-        stringBuilder.append("=" * 68)
-
-        count = 0
-        for entry in self.logfile.execute("SELECT * FROM History;").fetchall():
-            stringBuilder.append("{:^10}|{:^28}|{:^28}".format(entry[0], entry[1], entry[2]))
-
-            if (count := count + 1) >= entries:
-                break
-
-        return "\n".join(stringBuilder) + "\n"
+    def __del__(self):
+        db.close()
