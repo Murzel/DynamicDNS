@@ -23,14 +23,20 @@ class GoDaddy:
         return self.toList(requests.get(self.base_url + f"/v1/domains/{self.domain}/records/{type}/{name}", headers=self.getHeaders))
 
     def updateDNSRecord(self, type : str, name : str, ip : str):
-        ttl = self.getDNSRecord("A", "@").get("ttl")
-        body = json.dumps([{"data": ip, "name": name, "ttl": ttl, "type": type}])
+        previous_record = self.getDNSRecord(type, name)
+        
+        # Check if an update is necessary
+        if previous_record.get("data") == ip: 
+            return
+
+        # Assumes everything will be fine in the following put request...    
+        print(f'GoDaddy DNS Record ({type}, {name}) updated to new ip ("{ip}")')
 
         with DBConnection():
             History.create(type = type, name = name, ip_address = ip).\
                     save()
 
-        # assumes everything will be fine in the following put request...    
-        print(f'GoDaddy DNS Record ({type}, {name}) updated to new ip ("{ip}")')
+        # Send actual request to update the ip address
+        body = json.dumps([{"data": ip, "name": name, "ttl": previous_record.get("ttl"), "type": type}])
 
         return requests.put(self.base_url + f"/v1/domains/{self.domain}/records/{type}/{name}", body, headers=self.putHeaders).status_code
